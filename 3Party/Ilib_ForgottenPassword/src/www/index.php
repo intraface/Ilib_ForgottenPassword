@@ -67,6 +67,10 @@ class This_Filehandler_Root extends k_Dispatcher
 
 $application = new This_Filehandler_Root();
 
+$application->registry->registerConstructor('forgottenpassword', create_function(
+  '$className, $args, $registry',
+  'return new Ilib_ForgottenPassword($registry->get("database"), $args[0], "liveuser_users", array("username" => "handle", "password" => "passwd"));'
+));
 
 $application->registry->registerConstructor('database', create_function(
   '$className, $args, $registry',
