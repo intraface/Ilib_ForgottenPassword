@@ -14,8 +14,10 @@
  * @version   @package-version@
  * @link      http://public.intraface.dk
  */
+require_once dirname(__FILE__) . '/config.test.php';
 require_once 'PHPUnit/Framework.php';
-require_once dirname(__FILE__) . '/../src/Ilib/ForgottenPassword.php';
+require_once 'MDB2.php';
+require_once 'Ilib/ForgottenPassword.php';
 
 /**
  * Test class
@@ -30,9 +32,18 @@ require_once dirname(__FILE__) . '/../src/Ilib/ForgottenPassword.php';
  */
 class ForgottenPasswordTest extends PHPUnit_Framework_TestCase
 {
-    public function testConstruction()
+    private $db;
+
+    function setUp()
     {
-        $forgotten = new Ilib_ForgottenPassword('user');
+        $this->db = MDB2::factory(DB_DSN);
+    }
+
+    public function testUpdatePassword()
+    {
+        $forgotten = new Ilib_ForgottenPassword($this->db, 'member@skipcheckin.eu', "liveuser_users", array("username" => "handle", "password" => "passwd"));
+        $password = 'skipcheckin';
+        $this->assertTrue($forgotten->updatePassword($password));
     }
 
 }

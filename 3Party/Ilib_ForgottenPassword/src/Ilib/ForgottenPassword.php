@@ -4,40 +4,31 @@ class Ilib_ForgottenPassword
     private $db;
     private $new_password;
     private $observers = array();
-    private $table = 'user';
-    private $map = array('email'    => 'email',
-                         'password' => 'password');
+    private $table;
+    private $map;
 
-    function __construct($connection, $email)
+    public function __construct($connection, $email, $table = 'user', $mapping = array('username' => 'email', 'password' => 'password'))
     {
         $this->db    = $connection;
+        $this->db->loadModule('Extended');
         $this->email = $email;
-    }
-
-    function setTable($table)
-    {
         $this->table = $table;
-    }
-
-    function setMapping($mapping)
-    {
         $this->map = $mapping;
     }
 
-    function iForgotMyPassword($email)
+    public function iForgotMyPassword($email)
     {
         if (!Validate::email($email)) {
             return false;
         }
 
-        $result = $this->db->query("SELECT id FROM " . $this->table . " WHERE " . $this->map['email'] . " = " . $this->db->quote($email, 'text'));
+        $result = $this->db->query("SELECT " . $this->map['username'] . " FROM " . $this->table . " WHERE " . $this->map['username'] . " = " . $this->db->quote($email, 'text'));
         if (PEAR::isError($result)) {
             throw new Exception($result->getUserInfo());
         }
         if ($result->numRows() != 1) {
             return false;
         }
-        $row = $result->fetchRow(MDB2_FETCHMODE_ASSOC);
 
         $this->updatePassword($this->getNewPassword());
 
@@ -46,8 +37,7 @@ class Ilib_ForgottenPassword
         return true;
     }
 
-
-    function getNewPassword()
+    public function getNewPassword()
     {
         if (!empty($this->new_password)) {
             return $this->new_password;
@@ -56,37 +46,36 @@ class Ilib_ForgottenPassword
         return ($this->new_password = $generator->generate());
     }
 
-    function getEmail()
+    public function getEmail()
     {
         return $this->email;
     }
 
-    function updatePassword($password)
+    public function updatePassword($password)
     {
         $fields[$this->map['password']] = md5($password);
         $type = MDB2_AUTOQUERY_UPDATE;
-        $where = 'WHERE  ' . $this->map['email'] . ' = ' . $this->db->quote($this->email, 'string');
+        $where = $this->map['username'] . ' = ' . $this->db->quote($this->email, 'text');
         $result = $this->db->autoExecute($this->table, $fields, $type, $where);
         if (PEAR::isError($result)) {
             throw new Exception($result->getUserInfo());
         }
-        $this->notifyObservers();
         return true;
     }
 
-    function notifyObservers()
+    private function notifyObservers()
     {
         foreach ($this->getObservers() as $observer) {
             $observer->update($this);
         }
     }
 
-    function addObserver($observer)
+    public function addObserver($observer)
     {
         $this->observers[] = $observer;
     }
 
-    function getObservers()
+    private function getObservers()
     {
         return $this->observers;
     }
