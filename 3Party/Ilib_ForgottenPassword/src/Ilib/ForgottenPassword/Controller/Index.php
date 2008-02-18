@@ -13,7 +13,7 @@ class Ilib_ForgottenPassword_Controller_Index extends k_Controller
     {
         $this->document->title = $this->__('Forgotten password');
 
-        $forgotten = $this->registry->get('forgottenpassword', $this->POST['email']);
+        $forgotten = $this->registry->create('forgottenpassword', $this->POST['email']);
         $forgotten->addObserver(new Ilib_ForgottenPassword_Email($this->url('/login')));
 
         try {
