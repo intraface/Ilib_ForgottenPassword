@@ -34,7 +34,7 @@
             <channel>${pear.channel}</channel>
             <description>
                 <!--        Don't exceed this width         -->
-                Filehandler
+                Forgotten password.
             </description>
 
             <lead user="lsolesen" name="Lars Olesen" email="lars@legestue.net" />
@@ -49,22 +49,6 @@
 
                 <pear minimum_version="1.6.0"
                       recommended_version="1.6.1" />
-
-                <package name="DB_Sql"
-                         channel="public.intraface.dk"
-                         recommended_version="0.0.1"
-                         minimum_version="0.0.1" />
-
-                <package name="Ilib_Error"
-                         channel="public.intraface.dk"
-                         recommended_version="0.0.1"
-                         minimum_version="0.0.1" />
-
-                <package name="Ilib_DBQuery"
-                         channel="public.intraface.dk"
-                         recommended_version="0.1.1"
-                         minimum_version="0.1.1" />
-
 
             </dependencies>
 
@@ -82,7 +66,7 @@
         <mkdir dir="${build.dir}/${package-name}-${version}" />
         <copy todir="${build.dir}/${package-name}-${version}">
             <fileset dir="${build.dir}">
-                <include name="Intraface*/**" />
+                <include name="*/**" />
             </fileset>
         </copy>
         <delete file="${package-name}-${version}.tgz" />
