@@ -7,13 +7,12 @@ class Ilib_ForgottenPassword
     private $table;
     private $map;
 
-    public function __construct($connection, $email, $table = 'user', $mapping = array('username' => 'email', 'password' => 'password'))
+    public function __construct($connection, $table = 'user', $mapping = array('username' => 'email', 'password' => 'password'))
     {
         $this->db    = $connection;
         $this->db->loadModule('Extended');
-        $this->email = $email;
         $this->table = $table;
-        $this->map = $mapping;
+        $this->map   = $mapping;
     }
 
     public function iForgotMyPassword($email)
@@ -37,25 +36,25 @@ class Ilib_ForgottenPassword
         return true;
     }
 
+    function getRandomKeyGenerator()
+    {
+        return new Ilib_RandomKeyGenerator(6);
+    }
+
     public function getNewPassword()
     {
         if (!empty($this->new_password)) {
             return $this->new_password;
         }
-        $generator = new Ilib_RandomKeyGenerator(6);
+        $generator = $this->getRandomKeyGenerator();
         return ($this->new_password = $generator->generate());
     }
 
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    public function updatePassword($password)
+    public function updatePassword($email, $password)
     {
         $fields[$this->map['password']] = md5($password);
         $type = MDB2_AUTOQUERY_UPDATE;
-        $where = $this->map['username'] . ' = ' . $this->db->quote($this->email, 'text');
+        $where = $this->map['username'] . ' = ' . $this->db->quote($email, 'text');
         $result = $this->db->autoExecute($this->table, $fields, $type, $where);
         if (PEAR::isError($result)) {
             throw new Exception($result->getUserInfo());
