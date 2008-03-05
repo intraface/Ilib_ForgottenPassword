@@ -6,6 +6,7 @@ class Ilib_ForgottenPassword
     private $observers = array();
     private $table;
     private $map;
+    private $email;
 
     public function __construct($connection, $table = 'user', $mapping = array('username' => 'email', 'password' => 'password'))
     {
@@ -13,6 +14,11 @@ class Ilib_ForgottenPassword
         $this->db->loadModule('Extended');
         $this->table = $table;
         $this->map   = $mapping;
+    }
+
+    function getEmail()
+    {
+        return $this->email;
     }
 
     public function iForgotMyPassword($email)
@@ -29,7 +35,7 @@ class Ilib_ForgottenPassword
             return false;
         }
 
-        $this->updatePassword($this->getNewPassword());
+        $this->updatePassword($email, $this->getNewPassword());
 
         $this->notifyObservers();
 
@@ -52,6 +58,7 @@ class Ilib_ForgottenPassword
 
     public function updatePassword($email, $password)
     {
+        $this->email = $email;
         $fields[$this->map['password']] = md5($password);
         $type = MDB2_AUTOQUERY_UPDATE;
         $where = $this->map['username'] . ' = ' . $this->db->quote($email, 'text');
