@@ -41,9 +41,9 @@ class ForgottenPasswordTest extends PHPUnit_Framework_TestCase
 
     public function testUpdatePassword()
     {
-        $forgotten = new Ilib_ForgottenPassword($this->db, 'member@skipcheckin.eu', "liveuser_users", array("username" => "handle", "password" => "passwd"));
+        $forgotten = new Ilib_ForgottenPassword($this->db, "liveuser_users", array("username" => "handle", "password" => "passwd"));
         $password = 'skipcheckin';
-        $this->assertTrue($forgotten->updatePassword($password));
+        $this->assertTrue($forgotten->updatePassword('member@skipcheckin.eu', $password));
     }
 
 }
